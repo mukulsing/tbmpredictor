@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TBM-Predict | 6-Month Outcome Predictor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0e1a;--bg2:#0f1628;--bg3:#141d35;--panel:#1a2540;--panel2:#1f2d4a;--border:#2a3a5c;--accent:#00d4ff;--good:#00e5a0;--poor:#ff4d6d;--warn:#ffb347;--text:#e8f0ff;--text2:#8fa4cc;--text3:#4a6080;--gold:#ffd700;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 20% 10%,rgba(0,212,255,.06) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(0,150,255,.05) 0%,transparent 60%);pointer-events:none;z-index:0;}
+header{background:rgba(10,14,26,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 40px;position:sticky;top:0;z-index:100;}
+.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:72px;}
+.logo{display:flex;align-items:center;gap:14px;}
+.logo-icon{width:42px;height:42px;background:linear-gradient(135deg,var(--accent),var(--good));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.logo-name{font-family:'DM Serif Display',serif;font-size:23px;letter-spacing:.5px;}
+.logo-sub{font-size:10px;color:var(--text2);letter-spacing:2px;text-transform:uppercase;margin-top:1px;}
+.hbadge{padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.5px;}
+.hb1{background:rgba(0,212,255,.1);color:var(--accent);border:1px solid rgba(0,212,255,.2);}
+.hb2{background:rgba(0,229,160,.08);color:var(--good);border:1px solid rgba(0,229,160,.2);}
+.hbadges{display:flex;gap:8px;}
+
+/* HERO */
+.hero{text-align:center;padding:80px 40px 60px;position:relative;z-index:1;}
+.hero-tag{display:inline-block;padding:6px 20px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);border-radius:20px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:28px;}
+.hero h1{font-family:'DM Serif Display',serif;font-size:54px;line-height:1.15;margin-bottom:18px;background:linear-gradient(135deg,#fff 0%,var(--accent) 50%,var(--good) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero p{font-size:16px;color:var(--text2);max-width:560px;margin:0 auto 44px;line-height:1.75;font-weight:300;}
+.stats-row{display:flex;justify-content:center;gap:40px;flex-wrap:wrap;}
+.stat-item{text-align:center;}
+.stat-num{font-family:'DM Mono',monospace;font-size:30px;font-weight:500;color:var(--accent);display:block;}
+.stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-top:4px;}
+.stat-div{width:1px;height:44px;background:var(--border);align-self:center;}
+
+/* MAIN */
+.main{max-width:1100px;margin:0 auto;padding:0 30px 80px;position:relative;z-index:1;}
+.mic-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+.mic{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px;text-align:center;animation:su .5s ease both;}
+.mic:nth-child(1){animation-delay:.05s;}.mic:nth-child(2){animation-delay:.1s;}.mic:nth-child(3){animation-delay:.15s;}.mic:nth-child(4){animation-delay:.2s;}
+@keyframes su{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.mic-ico{font-size:22px;margin-bottom:8px;}
+.mic-val{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:var(--accent);}
+.mic-lbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;margin-top:3px;}
+
+/* CARDS */
+.fcard{background:var(--panel);border:1px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:20px;animation:su .5s ease both;}
+.fcard:nth-child(2){animation-delay:.1s;}.fcard:nth-child(3){animation-delay:.2s;}.fcard:nth-child(4){animation-delay:.3s;}.fcard:nth-child(5){animation-delay:.4s;}.fcard:nth-child(6){animation-delay:.5s;}
+.ch{display:flex;align-items:center;gap:12px;padding:20px 26px;border-bottom:1px solid var(--border);background:var(--panel2);}
+.ci{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.ci-b{background:rgba(0,212,255,.12);}.ci-o{background:rgba(255,179,71,.12);}.ci-p{background:rgba(150,100,255,.12);}.ci-g{background:rgba(0,229,160,.1);}
+.ch-title{font-size:14px;font-weight:600;}
+.ch-sub{font-size:10px;color:var(--text3);margin-top:2px;}
+
+/* FIELDS */
+.fg{padding:22px 26px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px 18px;}
+.fgrp{display:flex;flex-direction:column;gap:6px;}
+label{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;}
+.fhint{font-size:10px;color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0;margin-top:-3px;}
+.iw{position:relative;}
+input[type="number"]{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:11px 36px 11px 14px;font-family:'DM Mono',monospace;font-size:14px;color:var(--text);width:100%;transition:border-color .2s,box-shadow .2s;outline:none;-moz-appearance:textfield;}
+input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;}
+input[type="number"]:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,212,255,.1);}
+input[type="number"].hv{border-color:rgba(0,229,160,.35);}
+.idot{position:absolute;right:12px;top:50%;transform:translateY(-50%);width:7px;height:7px;border-radius:50%;background:var(--text3);transition:background .2s;}
+.idot.filled{background:var(--good);}
+
+/* TOGGLES */
+.tg{display:flex;border-radius:10px;overflow:hidden;border:1px solid var(--border);}
+.tb{flex:1;padding:10px 6px;background:var(--bg2);border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:var(--text3);transition:all .2s;letter-spacing:.3px;}
+.tb:not(:last-child){border-right:1px solid var(--border);}
+.tb.ay{background:rgba(255,77,109,.18);color:var(--poor);}
+.tb.an{background:rgba(0,229,160,.1);color:var(--good);}
+
+/* PREDICT */
+.psec{padding:26px;display:flex;flex-direction:column;align-items:center;gap:14px;}
+.pbtn{background:linear-gradient(135deg,var(--accent) 0%,#0066ff 100%);color:#fff;border:none;padding:17px 56px;border-radius:13px;font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:.5px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 28px rgba(0,150,255,.3);}
+.pbtn::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);transition:left .4s;}
+.pbtn:hover::before{left:100%;}.pbtn:hover{transform:translateY(-2px);box-shadow:0 8px 38px rgba(0,150,255,.4);}
+.pnote{font-size:11px;color:var(--text3);text-align:center;}
+.emsg{color:var(--poor);font-size:12px;text-align:center;padding:10px 16px;background:rgba(255,77,109,.08);border-radius:8px;border:1px solid rgba(255,77,109,.2);}
+
+/* RESULT */
+#rp{display:none;animation:su .7s ease both;}
+.rc{border-radius:18px;overflow:hidden;border:1px solid var(--border);}
+.rh{padding:36px 32px;text-align:center;position:relative;}
+.rh.good{background:linear-gradient(135deg,rgba(0,229,160,.1),rgba(0,150,100,.06));border-bottom:1px solid rgba(0,229,160,.2);}
+.rh.poor{background:linear-gradient(135deg,rgba(255,77,109,.1),rgba(200,40,70,.06));border-bottom:1px solid rgba(255,77,109,.2);}
+.rol{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;}
+.rol.good{color:var(--good);}.rol.poor{color:var(--poor);}
+.rpct{font-family:'DM Serif Display',serif;font-size:88px;line-height:1;}
+.rpct.good{color:var(--good);}.rpct.poor{color:var(--poor);}
+.rstmt{font-size:17px;color:var(--text);font-weight:400;margin:12px 0 6px;line-height:1.5;}
+.rconf{font-size:12px;color:var(--text2);}
+
+/* PROB BAR */
+.pbs{padding:22px 32px;background:var(--panel2);border-bottom:1px solid var(--border);}
+.pbl{display:flex;justify-content:space-between;font-size:11px;font-weight:700;margin-bottom:10px;}
+.pbt{height:14px;background:var(--bg3);border-radius:7px;overflow:hidden;position:relative;}
+.pbfg{height:100%;background:linear-gradient(90deg,var(--good),#00b37a);border-radius:7px;transition:width 1.2s cubic-bezier(.25,1,.5,1);width:0;}
+.pbfp{position:absolute;top:0;right:0;height:100%;background:linear-gradient(90deg,#cc2040,var(--poor));border-radius:7px;transition:width 1.2s cubic-bezier(.25,1,.5,1);width:0;}
+.pblb{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:12px;margin-top:8px;}
+
+/* DETAIL GRID */
+.dg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--panel);}
+.di{padding:18px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);text-align:center;}
+.di:nth-child(3n){border-right:none;}
+.dv{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--text);display:block;}
+.dl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;margin-top:4px;}
+
+/* FEATURES */
+.ftsec{padding:24px 32px;background:var(--panel);}
+.fttl{font-size:11px;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px;}
+.fbrow{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.fbn{font-size:11px;color:var(--text2);width:170px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fbtr{flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;}
+.fbf{height:100%;border-radius:3px;transition:width .8s ease;width:0;}
+.fbv{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);width:50px;text-align:right;flex-shrink:0;}
+
+/* DISC */
+.disc{text-align:center;padding:22px 32px;background:rgba(255,179,71,.04);border-top:1px solid rgba(255,179,71,.12);}
+.disc p{font-size:11px;color:var(--warn);line-height:1.65;max-width:600px;margin:0 auto;}
+
+@media(max-width:768px){
+  .hero h1{font-size:34px;}
+  .fg{grid-template-columns:1fr 1fr;}
+  .mic-grid{grid-template-columns:1fr 1fr;}
+  .dg{grid-template-columns:1fr 1fr;}
+  .di:nth-child(2n){border-right:none;}
+  .stats-row{gap:20px;}
+  .stat-div{display:none;}
+  header{padding:0 20px;}
+  .hbadges{display:none;}
+  .rpct{font-size:64px;}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">🧠</div>
+      <div>
+        <div class="logo-name">TBM-Predict</div>
+        <div class="logo-sub">Tuberculous Meningitis · AI Outcome Predictor</div>
+      </div>
+    </div>
+    <div class="hbadges">
+      <span class="hbadge hb1">AUC 0.863</span>
+      <span class="hbadge hb2">n=57 Patients · 5-Fold CV</span>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-tag">🔬 Evidence-Based Clinical Prediction Model</div>
+  <h1>Predict 6-Month<br>TBM Patient Outcomes</h1>
+  <p>Enter clinical parameters to receive an AI-powered probabilistic prediction of good vs. poor outcomes at 6 months for Tuberculous Meningitis patients.</p>
+  <div class="stats-row">
+    <div class="stat-item"><span class="stat-num">86.3%</span><div class="stat-label">Model AUC</div></div>
+    <div class="stat-div"></div>
+    <div class="stat-item"><span class="stat-num">80.6%</span><div class="stat-label">Accuracy</div></div>
+    <div class="stat-div"></div>
+    <div class="stat-item"><span class="stat-num">57</span><div class="stat-label">Training Cases</div></div>
+    <div class="stat-div"></div>
+    <div class="stat-item"><span class="stat-num">15</span><div class="stat-label">Predictors</div></div>
+  </div>
+</section>
+
+<main class="main">
+  <div class="mic-grid">
+    <div class="mic"><div class="mic-ico">📊</div><div class="mic-val">LR</div><div class="mic-lbl">Algorithm</div></div>
+    <div class="mic"><div class="mic-ico">✅</div><div class="mic-val">5-Fold</div><div class="mic-lbl">Cross-Validation</div></div>
+    <div class="mic"><div class="mic-ico">🎯</div><div class="mic-val">MRS</div><div class="mic-lbl">Outcome Metric</div></div>
+    <div class="mic"><div class="mic-ico">⚖️</div><div class="mic-val">Balanced</div><div class="mic-lbl">Class Weights</div></div>
+  </div>
+
+  <!-- CLINICAL STATUS -->
+  <div class="fcard">
+    <div class="ch"><div class="ci ci-b">🧑‍⚕️</div><div><div class="ch-title">Clinical &amp; Neurological Status</div><div class="ch-sub">Vital signs and consciousness level at admission</div></div></div>
+    <div class="fg">
+      <div class="fgrp">
+        <label>GCS Score <span style="color:var(--poor)">*</span></label>
+        <span class="fhint">Glasgow Coma Scale (3–15)</span>
+        <div class="iw"><input type="number" id="gcs" placeholder="e.g. 14" min="3" max="15"><span class="idot" id="d-gcs"></span></div>
+      </div>
+      <div class="fgrp">
+        <label>Age (years) <span style="color:var(--poor)">*</span></label>
+        <span class="fhint">Patient age in years</span>
+        <div class="iw"><input type="number" id="age" placeholder="e.g. 30" min="1" max="100"><span class="idot" id="d-age"></span></div>
+      </div>
+      <div class="fgrp">
+        <label>SpO₂ (%)</label>
+        <span class="fhint">Oxygen saturation at admission</span>
+        <div class="iw"><input type="number" id="spo2" placeholder="e.g. 97" min="60" max="100" step="0.1"><span class="idot" id="d-spo2"></span></div>
+      </div>
+      <div class="fgrp">
+        <label>Serum Na⁺ (mEq/L)</label>
+        <span class="fhint">Sodium level</span>
+        <div class="iw"><input type="number" id="na" placeholder="e.g. 136" min="100" max="170" step="0.1"><span class="idot" id="d-na"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAB VALUES -->
+  <div class="fcard">
+    <div class="ch"><div class="ci ci-o">🧪</div><div><div class="ch-title">Laboratory &amp; CSF Parameters</div><div class="ch-sub">Biochemical markers from blood and cerebrospinal fluid</div></div></div>
+    <div class="fg">
+      <div class="fgrp">
+        <label>CSF Protein (mg/dL)</label>
+        <span class="fhint">Cerebrospinal fluid protein level</span>
+        <div class="iw"><input type="number" id="csf_protein" placeholder="e.g. 200" min="0" max="5000" step="0.1"><span class="idot" id="d-csf_protein"></span></div>
+      </div>
+      <div class="fgrp">
+        <label>CSF:Blood Glucose Ratio</label>
+        <span class="fhint">CSF glucose ÷ serum glucose</span>
+        <div class="iw"><input type="number" id="csf_ratio" placeholder="e.g. 0.35" min="0" max="1" step="0.01"><span class="idot" id="d-csf_ratio"></span></div>
+      </div>
+      <div class="fgrp">
+        <label>Blood Sugar (mg/dL)</label>
+        <span class="fhint">Fasting or random blood glucose</span>
+        <div class="iw"><input type="number" id="blood_sugar" placeholder="e.g. 95" min="30" max="600" step="0.1"><span class="idot" id="d-blood_sugar"></span></div>
+      </div>
+      <div class="fgrp">
+        <label>Blood Urea (mg/dL)</label>
+        <span class="fhint">Serum urea / BUN level</span>
+        <div class="iw"><input type="number" id="urea" placeholder="e.g. 28" min="0" max="500" step="0.1"><span class="idot" id="d-urea"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEURO DEFICITS -->
+  <div class="fcard">
+    <div class="ch"><div class="ci ci-p">⚡</div><div><div class="ch-title">Neurological Examination Findings</div><div class="ch-sub">Presence of deficits on clinical examination</div></div></div>
+    <div class="fg">
+      <div class="fgrp"><label>Motor Deficits</label><span class="fhint">Weakness / hemiplegia / paraplegia</span><div class="tg"><button class="tb an" onclick="setTog('motor',0,this)">✓ No</button><button class="tb" onclick="setTog('motor',1,this)">⚠ Yes</button></div></div>
+      <div class="fgrp"><label>Cranial Nerve Palsies</label><span class="fhint">Ophthalmoplegia / other CN palsies</span><div class="tg"><button class="tb an" onclick="setTog('cranial',0,this)">✓ No</button><button class="tb" onclick="setTog('cranial',1,this)">⚠ Yes</button></div></div>
+      <div class="fgrp"><label>Raised ICP</label><span class="fhint">Papilledema or signs of raised ICP</span><div class="tg"><button class="tb an" onclick="setTog('icp',0,this)">✓ No</button><button class="tb" onclick="setTog('icp',1,this)">⚠ Yes</button></div></div>
+      <div class="fgrp"><label>Altered Sensorium</label><span class="fhint">Decreased consciousness level</span><div class="tg"><button class="tb an" onclick="setTog('sensorium',0,this)">✓ No</button><button class="tb" onclick="setTog('sensorium',1,this)">⚠ Yes</button></div></div>
+    </div>
+  </div>
+
+  <!-- IMAGING -->
+  <div class="fcard">
+    <div class="ch"><div class="ci ci-g">🔍</div><div><div class="ch-title">Neuroimaging Findings (MRI / CT)</div><div class="ch-sub">Radiological abnormalities on brain imaging</div></div></div>
+    <div class="fg">
+      <div class="fgrp"><label>Basal Exudates</label><span class="fhint">Basal meningeal enhancement on MRI</span><div class="tg"><button class="tb an" onclick="setTog('basal',0,this)">✓ No</button><button class="tb" onclick="setTog('basal',1,this)">⚠ Yes</button></div></div>
+      <div class="fgrp"><label>Hydrocephalus</label><span class="fhint">Ventricular dilatation on imaging</span><div class="tg"><button class="tb an" onclick="setTog('hydro',0,this)">✓ No</button><button class="tb" onclick="setTog('hydro',1,this)">⚠ Yes</button></div></div>
+      <div class="fgrp"><label>Cerebral Infarcts</label><span class="fhint">Ischemic lesions on MRI/CT</span><div class="tg"><button class="tb an" onclick="setTog('infarcts',0,this)">✓ No</button><button class="tb" onclick="setTog('infarcts',1,this)">⚠ Yes</button></div></div>
+    </div>
+  </div>
+
+  <!-- PREDICT -->
+  <div class="fcard">
+    <div class="psec">
+      <button class="pbtn" onclick="predict()">🔮 &nbsp;Predict 6-Month Outcome</button>
+      <div id="emsg" style="display:none" class="emsg"></div>
+      <p class="pnote">⚕️ For clinical decision support only. Always integrate with clinical judgment.</p>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="rp">
+    <div class="rc">
+      <div class="rh" id="rh">
+        <div class="rol" id="rl">—</div>
+        <div class="rpct" id="rpct">—</div>
+        <div class="rstmt" id="rstmt">—</div>
+        <div class="rconf" id="rconf">—</div>
+      </div>
+      <div class="pbs">
+        <div class="pbl">
+          <span style="color:var(--good)">🟢 Good Outcome (MRS 0–2)</span>
+          <span style="color:var(--poor)">Poor Outcome (MRS 3–6) 🔴</span>
+        </div>
+        <div class="pbt"><div class="pbfg" id="bg"></div><div class="pbfp" id="bp"></div></div>
+        <div class="pblb">
+          <span id="lbg" style="color:var(--good)"></span>
+          <span id="lbp" style="color:var(--poor)"></span>
+        </div>
+      </div>
+      <div class="dg">
+        <div class="di"><span class="dv" id="dgp">—</span><div class="dl">Good Outcome Prob.</div></div>
+        <div class="di"><span class="dv" id="dpp">—</span><div class="dl">Poor Outcome Prob.</div></div>
+        <div class="di"><span class="dv" id="dcf">—</span><div class="dl">Confidence Level</div></div>
+        <div class="di"><span class="dv">0.863</span><div class="dl">Model AUC Score</div></div>
+        <div class="di"><span class="dv">80.6%</span><div class="dl">Model Accuracy</div></div>
+        <div class="di"><span class="dv" id="dmrs">—</span><div class="dl">Predicted MRS Range</div></div>
+      </div>
+      <div class="ftsec">
+        <div class="fttl">📈 Feature Contributions to This Prediction</div>
+        <div id="fbs"></div>
+      </div>
+      <div class="disc">
+        <p>⚠️ <strong>Clinical Disclaimer:</strong> This AI tool is for clinical decision support only and should not replace physician judgment. Predictions are based on statistical patterns from 57 TBM patients. Good outcome = MRS 0–2; Poor outcome = MRS 3–6. Always consult a neurologist for management decisions.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const MODEL = {"features": ["GCS (E+V+M out of 15)", "Age (years)", "Na (mEQ/L)", "Protein (mg/dL)", "CSF:Blood ratio", "SpO2 (%)", "Blood sugar (mg/dl)", "Urea (mg/dL)", "Motor deficits", "Cranial nerve palsies", "Raised ICP", "Basal exudates (Y/N)", "Hydrocephalus (Y/N)", "Altered sensorium (Y/N)", "Infarcts (Y/N)"], "means": [13.017543859649123, 28.210526315789473, 132.73508771929824, 345.1964912280702, 0.3466016393845817, 97.28070175438596, 108.35087719298245, 35.34210526315789, 0.21052631578947367, 0.3333333333333333, 0.21052631578947367, 0.43859649122807015, 0.47368421052631576, 0.6666666666666666, 0.15789473684210525], "stds": [1.9600503759206063, 10.855893123666304, 6.374744335515149, 488.01203248212806, 0.18211623019571213, 0.9319736831784865, 20.08795679013827, 21.981740248210485, 0.4076824574955174, 0.47140452079103157, 0.40768245749551735, 0.4962152850431914, 0.4993069989739547, 0.47140452079103157, 0.3646422752776585], "coefs": [-0.24905002292178505, 0.15256454710925102, 0.06588430040693874, 0.27044442725921514, -0.2484040948060297, 0.5395917757545737, 0.228302385579344, -0.010931002592789573, 1.3873620633382473, 0.9496112028804965, 0.4849664819578229, 0.46990044818487847, 0.19539432589895223, -0.2630437993965083, 0.41424621018637786], "intercept": -0.3877120888479416, "medians": {"GCS (E+V+M out of 15)": 14.0, "Age (years)": 25.0, "Na (mEQ/L)": 133.5, "Protein (mg/dL)": 182.0, "CSF:Blood ratio": 0.32558139534883723, "SpO2 (%)": 97.0, "Blood sugar (mg/dl)": 107.0, "Urea (mg/dL)": 28.0}, "num_features": ["GCS (E+V+M out of 15)", "Age (years)", "Na (mEQ/L)", "Protein (mg/dL)", "CSF:Blood ratio", "SpO2 (%)", "Blood sugar (mg/dl)", "Urea (mg/dL)"], "bin_features": ["Motor deficits", "Cranial nerve palsies", "Raised ICP", "Basal exudates (Y/N)", "Hydrocephalus (Y/N)", "Altered sensorium (Y/N)", "Infarcts (Y/N)"]};
+
+const togVals = {motor:0,cranial:0,icp:0,sensorium:0,basal:0,hydro:0,infarcts:0};
+
+function setTog(f,v,btn){
+  togVals[f]=v;
+  const g=btn.closest('.tg');
+  g.querySelectorAll('.tb').forEach(b=>b.classList.remove('ay','an'));
+  btn.classList.add(v?'ay':'an');
+}
+
+['gcs','age','spo2','na','csf_protein','csf_ratio','blood_sugar','urea'].forEach(id=>{
+  const inp=document.getElementById(id);
+  const dot=document.getElementById('d-'+id);
+  if(inp&&dot){
+    inp.addEventListener('input',()=>{
+      const f=inp.value!=='';
+      dot.classList.toggle('filled',f);
+      inp.classList.toggle('hv',f);
+    });
+  }
+});
+
+function sigmoid(x){return 1/(1+Math.exp(-x));}
+function gv(id,def){const v=parseFloat(document.getElementById(id).value);return isNaN(v)?def:v;}
+
+function predict(){
+  const em=document.getElementById('emsg');
+  const gcs=parseFloat(document.getElementById('gcs').value);
+  const age=parseFloat(document.getElementById('age').value);
+  if(isNaN(gcs)||isNaN(age)){
+    em.textContent='⚠️ Please enter at least GCS Score and Age to generate a prediction.';
+    em.style.display='block'; return;
+  }
+  em.style.display='none';
+  const m=MODEL.medians;
+  const feats=[
+    gv('gcs',m['GCS (E+V+M out of 15)']),
+    gv('age',m['Age (years)']),
+    gv('na',m['Na (mEQ/L)']),
+    gv('csf_protein',m['Protein (mg/dL)']),
+    gv('csf_ratio',m['CSF:Blood ratio']),
+    gv('spo2',m['SpO2 (%)']),
+    gv('blood_sugar',m['Blood sugar (mg/dl)']),
+    gv('urea',m['Urea (mg/dL)']),
+    togVals.motor,togVals.cranial,togVals.icp,togVals.basal,togVals.hydro,togVals.sensorium,togVals.infarcts
+  ];
+  const sc=feats.map((v,i)=>(v-MODEL.means[i])/MODEL.stds[i]);
+  let logit=MODEL.intercept;
+  for(let i=0;i<MODEL.coefs.length;i++) logit+=MODEL.coefs[i]*sc[i];
+  const pp=sigmoid(logit), pg=1-pp;
+  showResult(pg,pp,pp<0.5,feats);
+}
+
+const fnames=['GCS Score','Age','Serum Na⁺','CSF Protein','CSF:Blood Ratio','SpO₂','Blood Sugar','Blood Urea','Motor Deficits','Cranial N. Palsies','Raised ICP','Basal Exudates','Hydrocephalus','Alt. Sensorium','Infarcts'];
+
+function showResult(pg,pp,isGood,feats){
+  const rp=document.getElementById('rp');
+  rp.style.display='block';
+  rp.scrollIntoView({behavior:'smooth',block:'start'});
+  const main=isGood?pg:pp, pctStr=(main*100).toFixed(2)+'%', oc=isGood?'GOOD':'POOR';
+  document.getElementById('rh').className='rh '+(isGood?'good':'poor');
+  const rl=document.getElementById('rl');
+  rl.className='rol '+(isGood?'good':'poor');
+  rl.textContent='PREDICTED OUTCOME · '+oc;
+  const rp2=document.getElementById('rpct');
+  rp2.className='rpct '+(isGood?'good':'poor');
+  rp2.textContent=pctStr;
+  document.getElementById('rstmt').textContent='The patient has '+pctStr+' chances of a '+oc.toLowerCase()+' outcome at 6 months';
+  const cf=main>0.85?'Very High':main>0.70?'High':main>0.60?'Moderate':'Low';
+  document.getElementById('rconf').textContent='Confidence: '+cf+' · Based on Modified Rankin Scale (MRS 0–2 = Good, MRS 3–6 = Poor)';
+  setTimeout(()=>{
+    document.getElementById('bg').style.width=(pg*100)+'%';
+    document.getElementById('bp').style.width=(pp*100)+'%';
+  },100);
+  document.getElementById('lbg').textContent=(pg*100).toFixed(1)+'%';
+  document.getElementById('lbp').textContent=(pp*100).toFixed(1)+'%';
+  document.getElementById('dgp').textContent=(pg*100).toFixed(2)+'%';
+  document.getElementById('dpp').textContent=(pp*100).toFixed(2)+'%';
+  document.getElementById('dcf').textContent=cf;
+  document.getElementById('dmrs').textContent=isGood?'0–2 (Good)':'3–6 (Poor)';
+  
+  // Feature contributions
+  const conts=feats.map((v,i)=>Math.abs(MODEL.coefs[i]*((v-MODEL.means[i])/MODEL.stds[i])));
+  const maxC=Math.max(...conts);
+  const sorted=conts.map((c,i)=>i).sort((a,b)=>conts[b]-conts[a]);
+  const fb=document.getElementById('fbs');
+  fb.innerHTML='';
+  const dirLabels=MODEL.coefs.map((c,i)=>{
+    const contrib=MODEL.coefs[i]*((feats[i]-MODEL.means[i])/MODEL.stds[i]);
+    return contrib>0?'↑ Poor':'↓ Good';
+  });
+  const colors=MODEL.coefs.map((c,i)=>{
+    const contrib=MODEL.coefs[i]*((feats[i]-MODEL.means[i])/MODEL.stds[i]);
+    return contrib>0?'linear-gradient(90deg,#cc2040,var(--poor))':'linear-gradient(90deg,var(--good),#00b37a)';
+  });
+  sorted.slice(0,10).forEach((i,rank)=>{
+    const pct=maxC>0?(conts[i]/maxC*100):0;
+    const row=document.createElement('div');
+    row.className='fbrow';
+    row.innerHTML=`<div class="fbn" title="${fnames[i]}">${fnames[i]}</div><div class="fbtr"><div class="fbf" style="background:${colors[i]}" data-pct="${pct}"></div></div><div class="fbv">${dirLabels[i]}</div>`;
+    fb.appendChild(row);
+    setTimeout(()=>{row.querySelector('.fbf').style.width=pct+'%';},150+rank*60);
+  });
+}
+</script>
+</body>
+</html>

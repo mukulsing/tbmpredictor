@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: tbm-outcome-predictor
+    env: static
+    staticPublishPath: .
+    buildCommand: ""
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
